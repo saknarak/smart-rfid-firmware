@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SMART CONFIG</title>
+  </head>
+  <body>
+    <table border="1">
+      <tr>
+        <td><label for="ssid">ssid</label></td>
+        <td><input type="text" name="ssid" id="ssid"></td>
+      </tr>
+      <tr>
+        <td><label for="pass">pass</label></td>
+        <td><input type="text" name="pass" id="pass"></td>
+      </tr>
+      <tr>
+        <td><label for="apiUrl">apiUrl</label></td>
+        <td><input type="text" name="apiUrl" id="apiUrl"></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button type="button" onclick="saveConfig()">SAVE CONIFG</button>
+        </td>
+      </tr>
+    </table>
+    <script>
+async function loadConfig() {
+  try {
+    let response = await fetch('/config')
+    let cfg = await response.json()
+    document.querySelector('#ssid').value = cfg.ssid || ''
+    document.querySelector('#pass').value = cfg.pass || ''
+    document.querySelector('#apiUrl').value = cfg.apiUrl || ''
+  } catch (e) {
+    console.log('loadConfig error', e)
+  }
+}
+async function saveConfig() {
+  try {
+    let cfg = {
+      ssid: document.querySelector('#ssid').value,
+      pass: document.querySelector('#pass').value,
+      apiUrl: document.querySelector('#apiUrl').value,
+    }
+    let response = await fetch('/config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cfg),
+    })
+    let res = await response.json()
+    if (!res.ok) {
+      throw new Error('save not ok')
+    }
+    console.log('save ok')
+  } catch (e) {
+    console.log('save not ok', e)
+  }
+}
+loadConfig()
+    </script>
+  </body>
+</html>
